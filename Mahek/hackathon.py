@@ -8,7 +8,7 @@ Created on Fri Oct 25 15:42:36 2024
 
 import numpy as np
 import pandas as pd
-import matplotlib as plt
+import plotly.express as px
  
 #Reading the arable data
 arable_team_2 = pd.read_excel("../Data/sensor_data/24 KSU TAPS Arable.xlsx", sheet_name="Team #2 Data", skiprows=2)
@@ -51,4 +51,9 @@ data = pd.DataFrame()
 data['Time_Stamp'] = arable_team_2.Timestamp.copy()
 data['crop_demand'] = Crop_water_demand.copy()
 data['Precip'] = Precip.copy()
+
+fig = px.scatter(data, x='Time_Stamp', y='crop_demand', title='Crop Water Demand Over Time')
+fig.show()
+
+
 
