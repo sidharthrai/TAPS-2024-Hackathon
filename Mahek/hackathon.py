@@ -11,8 +11,9 @@ import pandas as pd
 import matplotlib as plt
  
 #Reading the arable data
-arable_team_2 = pd.read_excel("/Users/mahek/hackathon/Sensor Data/24 KSU TAPS Arable.xlsx", sheet_name="Team #2 Data")
-
+arable_team_2 = pd.read_excel("../Data/sensor_data/24 KSU TAPS Arable.xlsx", sheet_name="Team #2 Data", skiprows=2)
+arable_team_2.columns = arable_team_2.columns.str.replace(' ','')
+arable_team_2.columns = arable_team_2.columns.str.replace('(mm)','')
 
 
 
@@ -20,7 +21,7 @@ arable_team_2 = pd.read_excel("/Users/mahek/hackathon/Sensor Data/24 KSU TAPS Ar
 
 
 #Calculating field capacity for different plots based on soil texture
-soil_texture = pd.read_excel("/Users/mahek/hackathon/Soil Analysis/24 KSU TAPS Soil texture.xlsx",skiprows=1)
+soil_texture = pd.read_excel("../Data/soil_analysis/24 KSU TAPS Soil texture.xlsx",skiprows=1)
 soil_texture.columns = soil_texture.columns.str.replace('(%)', '_')
 soil_texture.columns = soil_texture.columns.str.replace(' ', '')
 
@@ -41,4 +42,13 @@ def field_capacity(sand, clay, OM):
     field_capac = coeff + (1.283*(coeff**2)-(0.374*coeff)-0.015)
     return field_capac
 
-soil_texture.FC = 100*field_capacity((soil_texture.Sand_/100), (soil_texture.Clay_/100), (soil_texture.OMC_/100))   
+field_capacity = 100*field_capacity((soil_texture.Sand_/100), (soil_texture.Clay_/100), (soil_texture.OMC_/100))   
+
+
+Crop_water_demand = arable_team_2.ArableCanopyEvapotranspiration + arable_team_2.ArableFieldEvapotranspiration
+Precip = arable_team_2.Precipitation*arable_team_2.PrecipitationHours
+data = pd.DataFrame()
+data['Time_Stamp'] = arable_team_2.Timestamp.copy()
+data['crop_demand'] = Crop_water_demand.copy()
+data['Precip'] = Precip.copy()
+
