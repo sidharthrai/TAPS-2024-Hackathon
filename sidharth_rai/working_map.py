@@ -5,7 +5,10 @@ import plotly.graph_objects as go
 import shapefile as shp  # pyshp
 import os 
 # Initialize Dash app
-import pandas as pd
+import geopandas as gpd
+
+import random
+
 app = dash.Dash(__name__)
 
 # Load shapefile
@@ -14,46 +17,63 @@ shape_file_name = '2024_Colby_TAPS_Harvest_Area.shp'
 shp_path = os.path.join(shape_file_folder, shape_file_name)
 
 sf = shp.Reader(shp_path)
+geo_df = gpd.read_file(shp_path)
 
 
 # Extract polygons from shapefile
 polygons = []
 all_lats = []
 all_lons = []
+polygons_by_trt = {}
 
-for shape in sf.shapes():
+for i,shape in enumerate(sf.shapes()):
     polygon = shape.points
-    polygons.append(polygon)
+
+    polygons.append({
+        'polygon': polygon,
+        'Block_ID': geo_df['Block_ID'][i],
+        'TRT_ID': geo_df['TRT_ID'][i]
+    })
+    
+    trt_id = geo_df['TRT_ID'][i]
+    # if trt_id not in polygons:
+    #     polygons[trt_id] = [] 
+    
+    # polygons[trt_id].append(polygon)
+    
     lons, lats = zip(*polygon)
     all_lats.extend(lats)
     all_lons.extend(lons)
 
 # Create a plotly figure
 fig = go.Figure()
+# Assign random colors to each unique Block_ID
+unique_blocks = set([poly['Block_ID'] for poly in polygons])
+colors = {block: f"rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})" for block in unique_blocks}
+
 
 # Add each polygon to the figure
-for i, polygon in enumerate(polygons):
+for i, poly_data in enumerate(polygons):
+    
+    polygon = poly_data['polygon']
+    block_id = poly_data['Block_ID']
+    trt_id = poly_data['TRT_ID']
+    
     lons, lats = zip(*polygon)
     fig.add_trace(go.Scattermapbox(
         lat=lats,
         lon=lons,
         mode='lines',
         fill='toself',
-        name=f'Plot {i+1}',  # Name for each plot
-        customdata=[i+1] * len(lats),  # Set custom data to identify clicks
+        name=f'TRT_ID {trt_id}',  # Name for each plot
+        fillcolor=colors[block_id],
+        line=dict(width=1, color='black'),
+        text=f"TRT_ID: {trt_id}",  # Text with TRT_ID
+        hoverinfo='text',
+        customdata=[trt_id] * len(lats),  # Set custom data to identify clicks
     ))
 
-pth = '/Users/sidharthrai/Documents/hackathone_2024/Data/ec_data/2024_TAPS_Veris_raw_spatial_data.xlsx'
-df = pd.read_excel(pth)
 
-fig.add_trace(go.Scattermapbox(
-    lon=df['Long'],
-    lat=df['Lat'],
-    mode='markers',
-    marker=dict(size=8, color=df['Temp'], colorscale='Viridis', showscale=True),
-    text=df.apply(lambda row: f"Temp: {row['Temp']}°F, Altitude: {row['Altitude']}m, Speed: {row['Speed']} m/s", axis=1),
-    hoverinfo='text'
-))
 
 # Configure map layout, centering based on the dataset’s extent
 fig.update_layout(
@@ -78,8 +98,8 @@ app.layout = html.Div([
 )
 def display_click_data(clickData):
     if clickData:
-        plot_id = clickData['points'][0]['customdata']
-        return f'You clicked on Plot {plot_id}'
+        trt_id = clickData['points'][0]['customdata']
+        return f'You clicked on TRT_ID {trt_id}'
     return 'Click on a plot to see details.'
 
 if __name__ == '__main__':
