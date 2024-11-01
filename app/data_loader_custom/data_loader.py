@@ -7,6 +7,17 @@ from shapely.geometry import Point
 from scipy.interpolate import griddata
 import rioxarray  # For raster clipping
 
+import dash
+from dash import dcc, html, Input, Output
+import geopandas as gpd
+import plotly.graph_objects as go
+import rioxarray  # For raster clipping
+from scipy.interpolate import griddata
+import numpy as np
+import xarray as xr
+import pandas as pd
+from shapely.geometry import Point
+
 def load_plot_boundaries():
     path = '../Data/plot_boundaries/Map with all plots/2024_Colby_TAPS_Harvest_Area.shp'
     geo_df = gpd.read_file(path)
@@ -64,3 +75,60 @@ def load_arable_data():
     
     return arable_data
 
+
+
+
+def soil_texture_data():
+    soil_analysis = pd.read_excel("../Data/soil_analysis/24 KSU TAPS Soil texture.xlsx", skiprows=1)
+    geometry = [Point(xy) for xy in zip(soil_analysis['Lng'], soil_analysis['Lat'])]
+    soil_analysis_data = gpd.GeoDataFrame(soil_analysis, geometry=geometry)
+    soil_analysis_data.set_crs("EPSG:4326", inplace=True)
+    
+    # Load plot boundary shapefile
+    plot_boundary = gpd.read_file("../Data/plot_boundaries/Map with all plots/2024_Colby_TAPS_Harvest_Area.shx")
+
+    # Interpolate EC Shallow and Deep
+    points = np.array(list(zip(soil_analysis_data.geometry.x, soil_analysis_data.geometry.y)))
+    soil_texture = soil_analysis_data['Soil Textural Class'].values
+
+    #reclasify the values
+    def soil_texture_reclasify(soil_texture):
+        def reclassify(value):
+            if value == 'Silty Clay Loam':
+                return 1
+            elif value == 'Silt Loam':
+                return 2
+            elif value == 'Clay Loam':
+                return 3
+            else:
+                return 0
+        reclassify_vectorized = np.vectorize(reclassify)
+        reclassified_data = reclassify_vectorized(soil_texture)
+        return reclassified_data
+    
+    
+    soil_analysis_data['reclassified_soil_texture'] = soil_texture_reclasify(soil_texture)
+    reclassify_soil_texture = soil_analysis_data['reclassified_soil_texture']
+    
+    
+    # Define grid parameters for interpolation
+    x_min, x_max = points[:, 0].min(), points[:, 0].max()
+    y_min, y_max = points[:, 1].min(), points[:, 1].max()
+    grid_x, grid_y = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
+
+    # Interpolated grids
+    grid_z = griddata(points, reclassify_soil_texture, (grid_x, grid_y), method='cubic').astype(int)
+    # grid_z_string = soil_texture_reverse_clasify(grid_z_values)
+    # Convert interpolated grids to xarray DataArrays for clipping
+    soil_texture_da = xr.DataArray(grid_z, dims=("y", "x"), 
+                                coords={"y": np.linspace(y_min, y_max, grid_y.shape[1]), 
+                                        "x": np.linspace(x_min, x_max, grid_x.shape[0])})
+
+    # Set CRS to match the plot boundary CRS
+    soil_texture_da.rio.set_crs("EPSG:4326")
+    
+    
+    return soil_texture_da, plot_boundary
+   
+   
+   
