@@ -132,3 +132,36 @@ def soil_texture_data():
    
    
    
+   
+   
+
+def aqua_spy_data():
+       # Load and preprocess data
+    aqua_spy = pd.read_excel("../Data/sensor_data/24 KSU TAPS AquaSpy.xlsx", sheet_name=None, skiprows=3)
+    for sheet_name, df in aqua_spy.items():
+        aqua_spy[sheet_name] = df.rename(columns={'Unnamed: 0': 'Timestamp'})
+        
+    return aqua_spy
+
+
+
+def crop_water_data():
+    file_path="../Data/sensor_data/24 KSU TAPS Arable.xlsx"
+    # Load the Excel file and get all sheet names
+    sheet_names = pd.ExcelFile(file_path).sheet_names
+    combined_data = []
+
+    for sheet in sheet_names:
+        # Read and clean data for the current sheet
+        data = pd.read_excel(file_path, sheet_name=sheet, skiprows=2)
+        data.columns = data.columns.str.strip()  # Strip whitespace from column names
+        
+        if 'Timestamp' in data.columns and 'Mean Temp' in data.columns and 'Max Temp' in data.columns and 'Min Temp' in data.columns and 'Crop Coefficient' in data.columns and 'Precipitation' in data.columns:
+            data['Timestamp'] = pd.to_datetime(data['Timestamp'])
+            data['ET0 (mm/day)'] = 0.0023 * (data['Mean Temp'] + 17.8) * ((data['Max Temp'] - data['Min Temp']) ** 0.5)
+            data['Crop Water Demand (mm/day)'] = data['ET0 (mm/day)'] * data['Crop Coefficient']
+            data['Source'] = sheet
+            combined_data.append(data[['Timestamp', 'Crop Water Demand (mm/day)', 'Precipitation', 'Source']])
+
+    all_data = pd.concat(combined_data, ignore_index=True)
+    return all_data
