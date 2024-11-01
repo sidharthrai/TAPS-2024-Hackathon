@@ -19,10 +19,10 @@ def update_map(selected_blocks, selected_treatments):
     filtered_geo_df = geo_df[geo_df['Block_ID'].isin(selected_blocks)]
     filtered_geo_df = filtered_geo_df[filtered_geo_df['TRT_ID'].isin(selected_treatments)]
     colors = {
-        1: "blue",
-        2: "yellow",
-        3: "red",
-        4: "green"
+        1: "#4A90E2",  # Soft blue
+        2: "#F6BD60",  # Muted yellow
+        3: "#E57373",  # Soft red
+        4: "#81C784"   # Soft green
     }
 
     # Track which blocks have already been added to the legend

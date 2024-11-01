@@ -53,3 +53,14 @@ def load_ec_data():
     # boundary_x, boundary_y = list(selected_boundary.geometry.iloc[0].exterior.xy[0]), list(selected_boundary.geometry.iloc[0].exterior.xy[1])
     return ec_shallow_da, plot_boundary, ec_deep_da
     # return ec_shallow_clipped, ec_deep_clipped, boundary_x, boundary_y, plot_boundary
+
+
+
+
+
+
+def load_arable_data():
+    arable_data = pd.read_excel("../Data/sensor_data/24 KSU TAPS Arable.xlsx", sheet_name=None, skiprows=2)
+    
+    return arable_data
+
