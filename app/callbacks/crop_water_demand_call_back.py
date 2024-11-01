@@ -47,7 +47,7 @@ def update_crop_water_demand_graph(_):
         Output('irrigation_graph', 'figure'),
         Input('irrigation_graph', 'id')  # Triggered on app load
     )
-    def update_irrigation_graph(_):
+def update_irrigation_graph(_):
         # Convert irrigation data from inches to mm if needed
         irrigation_data_long['Irrigation (mm)'] = irrigation_data_long['Irrigation (inches)'] * 25.4
 
