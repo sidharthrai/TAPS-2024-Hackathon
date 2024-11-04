@@ -10,7 +10,7 @@ import plotly.express as px  # Assuming px is used for plotting
 crop_water_layput = dbc.Container([
         dbc.Row([
             dbc.Col([
-                html.H1("Crop Water Demand Dashboard"),
+                html.H1("Crop Water Demand",className="text-center mt-3 mb-4"),
                 dcc.Graph(id='crop_water_demand_graph'),
                 dcc.Graph(id='irrigation_graph')
             ])

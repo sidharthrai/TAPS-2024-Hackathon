@@ -23,7 +23,7 @@ treatments_checklist = dbc.Checklist(
 
 # Define layout
 map_layout = dbc.Container([
-    dbc.Row(dbc.Col(html.H2("Geospatial Plot Map", className="text-center mt-3 mb-4"))),
+    dbc.Row(dbc.Col(html.H2("M.A.R.U.T.H.I.", className="text-center mt-3 mb-4"))),
     dbc.Row([
         dbc.Col(
             dbc.Card([

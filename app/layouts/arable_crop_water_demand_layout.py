@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from app import app
-from data_loader_custom.data_loader import load_ec_data
+# from data_loader_custom.data_loader import load_ec_data
 from dash import  dcc
 import dash_bootstrap_components as dbc
 from dash import dcc, html
@@ -35,7 +35,7 @@ button_style = {
 crop_water_layout = dbc.Container([
     dbc.Row(
         dbc.Col(
-            html.H2("Arable: Crop Water Demand Over Time Plot", className="text-center mt-3 mb-4"),
+            html.H2("Arable: Soil Evapotranspiration Curve", className="text-center mt-3 mb-4"),
             style={"padding": "0", "margin": "0"}
         )
     ),
@@ -44,7 +44,7 @@ crop_water_layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader(
                     dbc.Button(
-                        "Arable: Crop Water Demand Over Time Plot",
+                        "Arable: Soil Evapotranspiration Curve",
                         id="crop_water_demand-toggle-button",
                         style=button_style,
                     ),

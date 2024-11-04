@@ -25,7 +25,7 @@ selected_tab_style = {
 
 # Layout with tabs and a single graph area
 ec_layout = dbc.Container([
-    dbc.Row(dbc.Col(html.H2("EC Plot", className="text-center mt-3 mb-4"))),
+    dbc.Row(dbc.Col(html.H2("Electrical Conductivity Plot", className="text-center mt-3 mb-4"))),
     
     # Tabs for shallow and deep EC plots
     dbc.Row([

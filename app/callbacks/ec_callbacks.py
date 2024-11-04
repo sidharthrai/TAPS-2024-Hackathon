@@ -7,11 +7,13 @@ from data_loader_custom.data_loader import load_ec_data
 ec_shallow_da, plot_boundary, ec_deep_da = load_ec_data()
 
 # Function to update the shallow plot
-def update_plot_shallow(selected_treatments):
+def update_plot_shallow(selected_treatments,selected_blocks):
     if not selected_treatments:
         return go.Figure()
 
-    selected_boundary = plot_boundary[plot_boundary['TRT_ID'].isin(selected_treatments)]
+    selected_boundary= plot_boundary[plot_boundary['Block_ID'].isin(selected_blocks)]
+    selected_boundary = selected_boundary[selected_boundary['TRT_ID'].isin(selected_treatments)]
+    
     if selected_boundary.empty:
         return go.Figure()
 
@@ -42,11 +44,12 @@ def update_plot_shallow(selected_treatments):
     return fig
 
 # Function to update the deep plot
-def update_plot_deep(selected_treatments):
+def update_plot_deep(selected_treatments,selected_blocks):
     if not selected_treatments:
         return go.Figure()
-
-    selected_boundary = plot_boundary[plot_boundary['TRT_ID'].isin(selected_treatments)]
+    
+    selected_boundary= plot_boundary[plot_boundary['Block_ID'].isin(selected_blocks)]
+    selected_boundary = selected_boundary[selected_boundary['TRT_ID'].isin(selected_treatments)]
     if selected_boundary.empty:
         return go.Figure()
 
@@ -79,10 +82,11 @@ def update_plot_deep(selected_treatments):
 # Define the callback to toggle between shallow and deep plot based on selected tab
 @app.callback(
     Output("ec_plot_graph", "figure"),
-    [Input("ec-tabs", "value")],
-    [State("treatments-checklist", "value")]
+    Input("ec-tabs", "value"),
+    Input("treatments-checklist", "value"),
+    Input('block-filter', 'value')
 )
-def toggle_graph_display(selected_tab, selected_treatments):
+def toggle_graph_display(selected_tab, selected_treatments, selected_blocks):
     if selected_tab == "deep":
-        return update_plot_deep(selected_treatments)
-    return update_plot_shallow(selected_treatments)
+        return update_plot_deep(selected_treatments,selected_blocks)
+    return update_plot_shallow(selected_treatments,selected_blocks)

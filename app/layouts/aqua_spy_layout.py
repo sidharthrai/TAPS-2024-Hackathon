@@ -11,7 +11,7 @@ teams = list(aqua_spy.keys())
 aqua_spy_lay =  dbc.Container([
         dbc.Row([
             dbc.Col([
-                html.H1("Soil Moisture Dashboard"),
+                html.H1("Aqua Spy: Soil Moisture Curve"),
                 dcc.Dropdown(
                     id="team_dropdown",
                     options=[{"label": team, "value": team} for team in teams],

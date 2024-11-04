@@ -27,8 +27,8 @@ def arable_crop_water_demand_over_time(_):
         ))
         # Customize layout
     fig.update_layout(
-            title={'text': 'ArableCrop Water Demand Over Time', 'x': 0.5},
+            title={'text': 'Arable: Soil Evapotranspiration Curve', 'x': 0.5},
             xaxis_title='Time',
-            yaxis_title='Crop Water Demand (mm)')
+            yaxis_title='Field Evapotranspiration (mm)')
 
     return fig
